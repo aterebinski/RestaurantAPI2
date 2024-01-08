@@ -1,7 +1,11 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using NLog.Web;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Middleware;
+using RestaurantAPI2.Models;
+using RestaurantAPI2.Models.Validators;
 using RestaurantAPI2.Services;
 using System.Reflection;
 
@@ -21,14 +25,21 @@ namespace RestaurantAPI2
             // Add services to the container.
 
             builder.Services.AddControllers();
+            //builder.Services.AddFluentValidation(); //obsolete
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<RestaurantDbContext>();
             builder.Services.AddScoped<RestaurantSeeder>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterUserDtoValidator>();
+
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
-            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            
+
             builder.Services.AddScoped<ErrorHandlingMiddleware>();       
             builder.Services.AddScoped<RequestTimeMiddleware>();
            
