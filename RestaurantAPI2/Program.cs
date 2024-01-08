@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using NLog.Web;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Middleware;
@@ -20,14 +21,18 @@ namespace RestaurantAPI2
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<RestaurantDbContext>();
             builder.Services.AddScoped<RestaurantSeeder>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
-            builder.Services.AddScoped<ErrorHandlingMiddleware>();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<RequestTimeMiddleware>();
             builder.Services.AddScoped<IDishService, DishService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            builder.Services.AddScoped<ErrorHandlingMiddleware>();       
+            builder.Services.AddScoped<RequestTimeMiddleware>();
+           
+            
 
             var app = builder.Build();
 
@@ -38,7 +43,7 @@ namespace RestaurantAPI2
             seeder.Seed();
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
-            app.UseMiddleware<RequestTimeMiddleware>();
+            //app.UseMiddleware<RequestTimeMiddleware>();
 
             app.UseHttpsRedirection();
 

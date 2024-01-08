@@ -21,6 +21,8 @@ namespace RestaurantAPI2
             CreateMap<EditRestaurantDTO, Restaurant>();
 
             CreateMap<CreateDishDTO, Dish>();
+
+            CreateMap<RegisterUserDTO, User>();
         }
     }
 }
