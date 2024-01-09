@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Middleware;
@@ -8,6 +9,7 @@ using RestaurantAPI2.Models;
 using RestaurantAPI2.Models.Validators;
 using RestaurantAPI2.Services;
 using System.Reflection;
+using System.Text;
 
 namespace RestaurantAPI2
 {
@@ -21,6 +23,30 @@ namespace RestaurantAPI2
             // NLog: Setup NLog for Dependency injection
             builder.Logging.ClearProviders();
             builder.Host.UseNLog();
+
+            
+            var authenticationSettings = new AuthenticationSettings();
+            builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
+
+            builder.Services.AddSingleton(authenticationSettings);
+
+            builder.Services.AddAuthentication(option =>
+            {
+                option.DefaultAuthenticateScheme = "Bearer";
+                option.DefaultScheme = "Bearer";
+                option.DefaultChallengeScheme = "Bearer";
+            }).AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = authenticationSettings.JwtIssuer,
+                    ValidAudience = authenticationSettings.JwtIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey)),
+                };
+            });
+
 
             // Add services to the container.
 
@@ -56,6 +82,8 @@ namespace RestaurantAPI2
             app.UseMiddleware<ErrorHandlingMiddleware>();
             //app.UseMiddleware<RequestTimeMiddleware>();
 
+
+            app.UseAuthentication();
             app.UseHttpsRedirection();
 
             app.UseSwagger();
@@ -66,6 +94,7 @@ namespace RestaurantAPI2
 
             app.UseRouting();
             app.UseAuthorization();
+            
 
 
             app.MapControllers();

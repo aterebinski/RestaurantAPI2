@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Exceptions;
 using RestaurantAPI2.Models;
@@ -43,7 +44,9 @@ namespace RestaurantAPI2.Services
 
         private Restaurant getRestauantById(int restaurantId)
         {
-            Restaurant restaurant = _dbContext.Restaurants.FirstOrDefault(i => i.Id == restaurantId);
+            Restaurant restaurant = _dbContext.Restaurants
+                .Include(d=>d.Dishes)
+                .FirstOrDefault(i => i.Id == restaurantId);
             if (restaurant is null)
                 throw new NotFoundException("Restaurant not found");
             return restaurant;
