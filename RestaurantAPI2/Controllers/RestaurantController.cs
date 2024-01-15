@@ -23,6 +23,7 @@ namespace RestaurantAPI2.Controllers
             _service = service;
         }
 
+        [Authorize(Policy = "AtLeast2RestaurantsCreatedByUser")]
         [HttpGet]
         public ActionResult<IEnumerable<Restaurant>> GetAll([FromQuery] string? searchPhrase)
         {

@@ -51,9 +51,13 @@ namespace RestaurantAPI2
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("HasNationality", policy => policy.RequireClaim("Nationality","Polish","German"));
-                options.AddPolicy("AtLeast20", policy => policy.AddRequirements(new MinimumAgeRequirements(20)));
-                //options.AddPolicy("ModifyOwn", policy => policy.AddRequirements(new ResourceOperationRequirement());
+                options.AddPolicy("HasNationality", policy => 
+                    policy.RequireClaim("Nationality","Polish","German"));
+                options.AddPolicy("AtLeast20", policy => 
+                    policy.AddRequirements(new MinimumAgeRequirements(20)));
+                options.AddPolicy("AtLeast2REstaurantsCreatedByUser", 
+                    policy => policy.AddRequirements(new CreateRestaurantRequirement(2)));
+
             });
             builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeRequirementsHandler>();
             builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
@@ -65,16 +69,23 @@ namespace RestaurantAPI2
             //builder.Services.AddFluentValidation(); //obsolete
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
+
             builder.Services.AddSwaggerGen();
+
             builder.Services.AddDbContext<RestaurantDbContext>();
+
             builder.Services.AddScoped<RestaurantSeeder>();
+
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
             builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterUserDtoValidator>();
 
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+
             builder.Services.AddScoped<IUserContextService, UserContextService>();
             builder.Services.AddHttpContextAccessor();
             
