@@ -1,8 +1,10 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
+using RestaurantAPI2.Authorization;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Middleware;
 using RestaurantAPI2.Models;
@@ -47,6 +49,15 @@ namespace RestaurantAPI2
                 };
             });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("HasNationality", policy => policy.RequireClaim("Nationality","Polish","German"));
+                options.AddPolicy("AtLeast20", policy => policy.AddRequirements(new MinimumAgeRequirements(20)));
+                //options.AddPolicy("ModifyOwn", policy => policy.AddRequirements(new ResourceOperationRequirement());
+            });
+            builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeRequirementsHandler>();
+            builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
+
 
             // Add services to the container.
 
@@ -64,6 +75,8 @@ namespace RestaurantAPI2
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IUserContextService, UserContextService>();
+            builder.Services.AddHttpContextAccessor();
             
 
             builder.Services.AddScoped<ErrorHandlingMiddleware>();       

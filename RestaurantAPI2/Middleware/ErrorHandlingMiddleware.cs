@@ -28,6 +28,10 @@ namespace RestaurantAPI2.Middleware
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync($"{badRequestException.Message}");
             }
+            catch (ForbiddenException forbiddenException)
+            {
+                context.Response.StatusCode = 403;
+            }
             catch (Exception e)
             {
                 _logger.LogWarning(e, e.Message);

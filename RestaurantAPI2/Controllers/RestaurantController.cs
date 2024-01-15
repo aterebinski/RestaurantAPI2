@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAPI2.Entities;
 using RestaurantAPI2.Models;
 using RestaurantAPI2.Services;
+using System.Security.Claims;
 
 namespace RestaurantAPI2.Controllers
 {
     [Route("api/restaurant")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class RestaurantController : ControllerBase
     {
         private readonly IRestaurantService _service;
@@ -21,13 +24,13 @@ namespace RestaurantAPI2.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Restaurant>> GetAll()
+        public ActionResult<IEnumerable<Restaurant>> GetAll([FromQuery] string? searchPhrase)
         {
-            var restaurantsDto = _service.GetAll();
+            var restaurantsDto = _service.GetAll(searchPhrase);
             return StatusCode(200,restaurantsDto);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy= "HasNationality")]
         [HttpGet("{Id}")]
         public ActionResult<Restaurant> Get([FromRoute] int Id)
         {
@@ -38,6 +41,7 @@ namespace RestaurantAPI2.Controllers
         [HttpPost]
         public ActionResult CreateRestaurant([FromBody]CreateRestaurantDTO restaurantDto)
         {
+            var userId = int.Parse(User.FindFirst(i => i.Type == ClaimTypes.NameIdentifier).Value);
             int restaurantId = _service.Create(restaurantDto);
             return Created($"/api/restaurant/{restaurantId}",null);
         }
