@@ -81,6 +81,7 @@ namespace RestaurantAPI2
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
             builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterUserDtoValidator>();
+            builder.Services.AddScoped<IValidator<RestaurantQuery>, RestaurantQueryValidator>();
 
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
@@ -88,13 +89,10 @@ namespace RestaurantAPI2
 
             builder.Services.AddScoped<IUserContextService, UserContextService>();
             builder.Services.AddHttpContextAccessor();
-            
 
             builder.Services.AddScoped<ErrorHandlingMiddleware>();       
             builder.Services.AddScoped<RequestTimeMiddleware>();
            
-            
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -105,7 +103,6 @@ namespace RestaurantAPI2
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
             //app.UseMiddleware<RequestTimeMiddleware>();
-
 
             app.UseAuthentication();
             app.UseHttpsRedirection();
@@ -118,8 +115,6 @@ namespace RestaurantAPI2
 
             app.UseRouting();
             app.UseAuthorization();
-            
-
 
             app.MapControllers();
 
