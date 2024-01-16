@@ -23,11 +23,11 @@ namespace RestaurantAPI2.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = "AtLeast2RestaurantsCreatedByUser")]
+        //[Authorize(Policy = "AtLeast2RestaurantsCreatedByUser")]
         [HttpGet]
-        public ActionResult<IEnumerable<Restaurant>> GetAll([FromQuery] string? searchPhrase)
+        public ActionResult<IEnumerable<Restaurant>> GetAll([FromQuery] RestaurantQuery query)
         {
-            var restaurantsDto = _service.GetAll(searchPhrase);
+            var restaurantsDto = _service.GetAll(query);
             return StatusCode(200,restaurantsDto);
         }
 

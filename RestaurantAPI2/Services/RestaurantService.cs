@@ -13,7 +13,7 @@ namespace RestaurantAPI2.Services
     public interface IRestaurantService
     {
         int Create(CreateRestaurantDTO dto);
-        List<RestaurantDTO> GetAll(string searchPhrase);
+        PageResult<RestaurantDTO> GetAll(RestaurantQuery query);
         RestaurantDTO GetById(int Id);
         public void Delete(int id);
         public void Update(int id, EditRestaurantDTO dto);
@@ -54,15 +54,24 @@ namespace RestaurantAPI2.Services
 
         }
 
-        public List<RestaurantDTO> GetAll(string searchPhrase)
+        public PageResult<RestaurantDTO> GetAll(RestaurantQuery query)
         {
-            var restaurants = DbContext
+            var dbQuery = DbContext
                 .Restaurants
                 .Include(c => c.Address)
                 .Include(c => c.Dishes)
-                .Where(i => searchPhrase == null || (i.Name.ToLower().Contains(searchPhrase.ToLower())||i.Name.Contains(searchPhrase.ToLower())))
+                .Where(i => query.SearchPhrase == null || (i.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || i.Name.Contains(query.SearchPhrase.ToLower())));
+
+            int totalItemsCount = dbQuery.Count();
+
+            var restaurants = dbQuery
                 .ToList();
-            return _mapper.Map<List<RestaurantDTO>>(restaurants);
+
+            var restaurantsDto = _mapper.Map<List<RestaurantDTO>>(restaurants);
+
+            var pageResult = new PageResult<RestaurantDTO>(restaurantsDto,totalItemsCount, query.PageSize, query.PageNumber);
+
+            return pageResult;
         }
 
         public int Create(CreateRestaurantDTO dto)
