@@ -92,8 +92,18 @@ namespace RestaurantAPI2
 
             builder.Services.AddScoped<ErrorHandlingMiddleware>();       
             builder.Services.AddScoped<RequestTimeMiddleware>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontEndClient", policyBuilder =>
+                    policyBuilder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins(builder.Configuration["AllowedOrigins"]));
+            });
            
             var app = builder.Build();
+
+            app.UseCors("FrontEndClient");
 
             // Configure the HTTP request pipeline.
 
