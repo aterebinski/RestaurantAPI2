@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using RestaurantAPI2.Authorization;
@@ -72,7 +73,10 @@ namespace RestaurantAPI2
 
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<RestaurantDbContext>();
+            builder.Services.AddDbContext<RestaurantDbContext>( options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("RestaurantsDbConnection"));
+            });
 
             builder.Services.AddScoped<RestaurantSeeder>();
 
