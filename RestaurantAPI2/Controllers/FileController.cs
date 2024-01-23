@@ -7,9 +7,10 @@ using System.Reflection.Metadata.Ecma335;
 namespace RestaurantAPI2.Controllers
 {
     [Route("file")]
-    [Authorize]
+    //[Authorize]
     public class FileController : ControllerBase
     {
+        [ResponseCache(Duration = 1200, VaryByQueryKeys = new[] { "FileName" })]
         public ActionResult GetFile([FromQuery]string FileName)
         {
             string rootPath = Directory.GetCurrentDirectory();
