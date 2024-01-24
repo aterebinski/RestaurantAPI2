@@ -1,4 +1,5 @@
-﻿using RestaurantAPI2.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantAPI2.Entities;
 
 namespace RestaurantAPI2
 {
@@ -14,6 +15,14 @@ namespace RestaurantAPI2
         {
             if (!_dbContext.Restaurants.Any())
             {
+                //pobierz listę migracji które nie zostały jeszce wykonane
+                var pendingMigrations  = _dbContext.Database.GetPendingMigrations();
+                if (pendingMigrations != null && pendingMigrations.Any()) 
+                {
+                    _dbContext.Database.Migrate();
+                }
+
+
                 IEnumerable<Restaurant> restaurants = GetRestaurants();
                 _dbContext.Restaurants.AddRange(restaurants);
                 _dbContext.SaveChanges();
