@@ -78,6 +78,7 @@ namespace RestaurantAPI2
                 options.UseSqlServer(builder.Configuration.GetConnectionString("RestaurantsDbConnection"));
             });
 
+            //some fix
             builder.Services.AddScoped<RestaurantSeeder>();
 
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
